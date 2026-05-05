@@ -42,7 +42,7 @@ const usePrefersDark = () => {
 export const PortfolioChart = ({ result }: PortfolioChartProps) => {
   const chartRef = useRef<ChartJS<'line'> | null>(null);
   const isDark = usePrefersDark();
-  const labels = useMemo(() => Array.from({ length: 120 }, (_, index) => String(index + 1)), []);
+  const labels = useMemo(() => Array.from({ length: result.months }, (_, index) => String(index + 1)), [result.months]);
 
   const data = useMemo<ChartData<'line', number[], string>>(
     () => ({
@@ -158,7 +158,7 @@ export const PortfolioChart = ({ result }: PortfolioChartProps) => {
 
               if (item.datasetIndex === 0) {
                 const lines = [`Valor cartera: $${fmt(value)}`, `Si vendes aquí: ${signed}`];
-                if (month < 120 && futureLoss > 0) {
+                if (month < result.months && futureLoss > 0) {
                   lines.push(`Te perderías $${fmt(futureLoss)} futuros`);
                 }
                 return lines;
@@ -170,15 +170,17 @@ export const PortfolioChart = ({ result }: PortfolioChartProps) => {
         },
         phasePlugin: {
           dark: isDark,
+          monthCount: result.months,
         },
         annotationsPlugin: {
           worstMonth: result.peorMes,
           breakEvenMonth: result.breakEvenMes,
+          monthCount: result.months,
           dark: isDark,
         },
       },
     }),
-    [isDark, result.aportesAcum, result.breakEvenMes, result.peorMes, result.valores, result.valorFinal],
+    [isDark, result.aportesAcum, result.breakEvenMes, result.months, result.peorMes, result.valores, result.valorFinal],
   );
 
   useEffect(() => {
@@ -192,7 +194,7 @@ export const PortfolioChart = ({ result }: PortfolioChartProps) => {
           Evolución de cartera
         </h2>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-          Valor estimado frente a tus aportes acumulados.
+          Valor estimado frente a tus aportes acumulados. Si la línea azul queda bajo la gris, vender sería salir en pérdida.
         </p>
       </div>
       <div className="h-[340px]">

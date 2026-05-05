@@ -1,7 +1,8 @@
 import { BTC_ALLOC, BTC_SPREAD, btcPath, cspxPath, FX_PEN_USD, SP500_ALLOC, SP500_FEE_USD, WISE_FEE } from './prices';
 import type { SimulationResult, YearROI } from './types';
 
-const MONTHS = 120;
+const MAX_YEARS = 10;
+const MONTHS_PER_YEAR = 12;
 
 const initialTranche = (month: number, capitalUSD: number): number => {
   if (month === 1) return capitalUSD * 0.5;
@@ -10,7 +11,9 @@ const initialTranche = (month: number, capitalUSD: number): number => {
   return 0;
 };
 
-export const simulate = (aporteMensual: number, capitalSoles: number): SimulationResult => {
+export const simulate = (aporteMensual: number, capitalSoles: number, years = MAX_YEARS): SimulationResult => {
+  const clampedYears = Math.min(MAX_YEARS, Math.max(1, Math.round(years)));
+  const months = clampedYears * MONTHS_PER_YEAR;
   const capitalUSD = (capitalSoles / FX_PEN_USD) * (1 - WISE_FEE);
   const valores: number[] = [];
   const aportesAcum: number[] = [];
@@ -23,7 +26,7 @@ export const simulate = (aporteMensual: number, capitalSoles: number): Simulatio
   let worstROI = Number.POSITIVE_INFINITY;
   let worstMonth = 1;
 
-  for (let month = 1; month <= MONTHS; month += 1) {
+  for (let month = 1; month <= months; month += 1) {
     const tranche = initialTranche(month, capitalUSD);
     const amount = aporteMensual + tranche;
     aporteAcum += amount;
@@ -46,8 +49,8 @@ export const simulate = (aporteMensual: number, capitalSoles: number): Simulatio
       worstMonth = month;
     }
 
-    if (month % 12 === 0) {
-      const year = month / 12;
+    if (month % MONTHS_PER_YEAR === 0) {
+      const year = month / MONTHS_PER_YEAR;
       yearROI.push({
         year,
         aporte: aporteAcum,
@@ -62,19 +65,23 @@ export const simulate = (aporteMensual: number, capitalSoles: number): Simulatio
   const breakEvenMes = worstROI < 0
     ? rois.findIndex((roi, index) => index >= worstMonth && roi >= 0) + 1
     : 0;
+  const resolvedBreakEvenMes = breakEvenMes > 0 ? breakEvenMes : null;
   const valorFinal = valores[valores.length - 1];
-  const aportesMensualesTotal = aporteMensual * MONTHS;
+  const aportesMensualesTotal = aporteMensual * months;
   const totalInvertido = capitalUSD + aportesMensualesTotal;
 
   return {
     valores,
     aportesAcum,
+    years: clampedYears,
+    months,
     totalInvertido,
     valorFinal,
     ganancia: valorFinal - totalInvertido,
     peorROI: worstROI,
     peorMes: worstMonth,
-    breakEvenMes: breakEvenMes > 0 ? breakEvenMes : null,
+    breakEvenMes: resolvedBreakEvenMes,
+    recoveryMonths: resolvedBreakEvenMes === null ? null : resolvedBreakEvenMes - worstMonth,
     yearROI,
     capitalUSD,
     aportesMensualesTotal,

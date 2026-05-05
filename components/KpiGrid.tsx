@@ -6,32 +6,40 @@ interface KpiGridProps {
 }
 
 export const KpiGrid = ({ result }: KpiGridProps) => {
+  const finalLabel = result.years === 1 ? 'Valor año 1' : `Valor año ${result.years}`;
+  const gainIsPositive = result.ganancia >= 0;
   const cards = [
     {
       label: 'Total que invertirás',
       value: `$${fmt(result.totalInvertido)}`,
-      sublabel: 'Capital + 120 aportes',
+      sublabel: `Capital + ${result.months} aportes`,
+      explanation: 'Es tu esfuerzo real; sirve como base para medir si el plan creó valor.',
       className: 'bg-[var(--bg-subtle)] text-[var(--text-primary)]',
       labelClass: 'text-[var(--text-secondary)]',
     },
     {
-      label: 'Valor año 10',
+      label: finalLabel,
       value: `$${fmt(result.valorFinal)}`,
-      sublabel: 'Lo que tendrás al final',
+      sublabel: 'Lo que tendrías si no vendes antes',
+      explanation: 'Resume el efecto conjunto de aportes, precios, comisiones y disciplina.',
       className: 'bg-[var(--bg-subtle)] text-[var(--text-primary)]',
       labelClass: 'text-[var(--text-secondary)]',
     },
     {
-      label: 'Ganancia neta',
-      value: `+$${fmt(Math.max(0, result.ganancia))}`,
-      sublabel: 'Magia del compuesto',
-      className: 'bg-[var(--green-soft)] text-[var(--green-text)]',
-      labelClass: 'text-[var(--green-text)]',
+      label: gainIsPositive ? 'Ganancia neta' : 'Pérdida temporal',
+      value: `${gainIsPositive ? '+' : '-'}$${fmt(Math.abs(result.ganancia))}`,
+      sublabel: gainIsPositive ? 'Diferencia a tu favor' : 'Diferencia contra lo invertido',
+      explanation: 'Mide cuánto cambia tu patrimonio frente al dinero que pusiste.',
+      className: gainIsPositive
+        ? 'bg-[var(--green-soft)] text-[var(--green-text)]'
+        : 'bg-[var(--red-soft)] text-[var(--red-text)]',
+      labelClass: gainIsPositive ? 'text-[var(--green-text)]' : 'text-[var(--red-text)]',
     },
     {
       label: 'Peor momento',
       value: `${result.peorROI.toFixed(1)}%`,
-      sublabel: 'Lo que tendrás que aguantar',
+      sublabel: `Mes ${result.peorMes}`,
+      explanation: 'Está aquí para medir tolerancia: cuánto rojo tendrías que aguantar.',
       className: 'bg-[var(--red-soft)] text-[var(--red-text)]',
       labelClass: 'text-[var(--red-text)]',
     },
@@ -46,6 +54,7 @@ export const KpiGrid = ({ result }: KpiGridProps) => {
             {card.value}
           </p>
           <p className={`mt-2 text-xs ${card.labelClass}`}>{card.sublabel}</p>
+          <p className={`mt-3 text-[11px] leading-4 ${card.labelClass}`}>{card.explanation}</p>
         </article>
       ))}
     </section>

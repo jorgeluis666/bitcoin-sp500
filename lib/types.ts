@@ -8,12 +8,15 @@ export interface YearROI {
 export interface SimulationResult {
   valores: number[];
   aportesAcum: number[];
+  years: number;
+  months: number;
   totalInvertido: number;
   valorFinal: number;
   ganancia: number;
   peorROI: number;
   peorMes: number;
   breakEvenMes: number | null;
+  recoveryMonths: number | null;
   yearROI: YearROI[];
   capitalUSD: number;
   aportesMensualesTotal: number;

@@ -4,10 +4,12 @@ declare module 'chart.js' {
   interface PluginOptionsByType<TType extends ChartType> {
     phasePlugin?: {
       dark?: boolean;
+      monthCount?: number;
     };
     annotationsPlugin?: {
       worstMonth: number;
       breakEvenMonth: number | null;
+      monthCount?: number;
       dark?: boolean;
     };
   }
@@ -39,18 +41,23 @@ const drawBand = (
   chart: Chart,
   startIndex: number,
   endIndex: number,
+  monthCount: number,
   color: string,
 ) => {
   const { ctx, chartArea, scales } = chart;
   const xScale = scales.x;
   if (!xScale) return;
 
+  const maxIndex = monthCount - 1;
+  const safeEndIndex = Math.min(endIndex, maxIndex);
+  if (startIndex > maxIndex || safeEndIndex < 0 || safeEndIndex < startIndex) return;
+
   const leftBoundary = startIndex <= 0
     ? chartArea.left
     : (xScale.getPixelForValue(startIndex - 1) + xScale.getPixelForValue(startIndex)) / 2;
-  const rightBoundary = endIndex >= 119
+  const rightBoundary = safeEndIndex >= maxIndex
     ? chartArea.right
-    : (xScale.getPixelForValue(endIndex) + xScale.getPixelForValue(endIndex + 1)) / 2;
+    : (xScale.getPixelForValue(safeEndIndex) + xScale.getPixelForValue(safeEndIndex + 1)) / 2;
 
   ctx.save();
   ctx.fillStyle = color;
@@ -62,22 +69,24 @@ export const phasePlugin: Plugin<'line'> = {
   id: 'phasePlugin',
   beforeDatasetsDraw(chart, _args, options) {
     const dark = options.dark === true;
-    drawBand(chart, 0, 8, dark ? 'rgba(242, 139, 130, 0.12)' : 'rgba(217, 48, 37, 0.06)');
-    drawBand(chart, 9, 23, dark ? 'rgba(253, 214, 99, 0.12)' : 'rgba(249, 171, 0, 0.07)');
-    drawBand(chart, 24, 119, dark ? 'rgba(129, 201, 149, 0.1)' : 'rgba(30, 142, 62, 0.05)');
+    const monthCount = options.monthCount ?? 120;
+    drawBand(chart, 0, 8, monthCount, dark ? 'rgba(242, 139, 130, 0.12)' : 'rgba(217, 48, 37, 0.06)');
+    drawBand(chart, 9, 23, monthCount, dark ? 'rgba(253, 214, 99, 0.12)' : 'rgba(249, 171, 0, 0.07)');
+    drawBand(chart, 24, monthCount - 1, monthCount, dark ? 'rgba(129, 201, 149, 0.1)' : 'rgba(30, 142, 62, 0.05)');
   },
 };
 
 const drawAnnotation = (
   chart: Chart,
   month: number,
+  monthCount: number,
   label: string,
   color: string,
   dashed: boolean,
 ) => {
   const { ctx, chartArea, scales } = chart;
   const xScale = scales.x;
-  if (!xScale || month < 1 || month > 120) return;
+  if (!xScale || month < 1 || month > monthCount) return;
 
   const x = xScale.getPixelForValue(month - 1);
   const y = chartArea.top;
@@ -112,9 +121,10 @@ const drawAnnotation = (
 export const annotationsPlugin: Plugin<'line'> = {
   id: 'annotationsPlugin',
   afterDatasetsDraw(chart, _args, options) {
-    drawAnnotation(chart, options.worstMonth, `Peor mes ${options.worstMonth}`, '#D93025', true);
+    const monthCount = options.monthCount ?? 120;
+    drawAnnotation(chart, options.worstMonth, monthCount, `Peor mes ${options.worstMonth}`, '#D93025', true);
     if (options.breakEvenMonth !== null) {
-      drawAnnotation(chart, options.breakEvenMonth, `Verde mes ${options.breakEvenMonth}`, '#1E8E3E', true);
+      drawAnnotation(chart, options.breakEvenMonth, monthCount, `Verde mes ${options.breakEvenMonth}`, '#1E8E3E', true);
     }
   },
 };

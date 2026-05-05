@@ -125,7 +125,7 @@ export const RoiChart = ({ result }: RoiChartProps) => {
           ROI por año
         </h2>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-          Retorno acumulado al cierre de cada año.
+          Retorno acumulado al cierre de cada año. Un año rojo al inicio muestra el costo de comprar durante caída, no una predicción de calendario.
         </p>
       </div>
       <div className="h-[220px]">

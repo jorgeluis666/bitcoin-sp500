@@ -1,11 +1,13 @@
-import { FX_PEN_USD, WISE_FEE } from '@/lib/prices';
 import { fmt } from '@/lib/format';
+import { FX_PEN_USD, WISE_FEE } from '@/lib/prices';
 
 interface ControlsProps {
   aporte: number;
   capital: number;
+  years: number;
   onAporteChange: (value: number) => void;
   onCapitalChange: (value: number) => void;
+  onYearsChange: (value: number) => void;
 }
 
 const presets = [
@@ -15,22 +17,30 @@ const presets = [
   { label: 'Máximo', aporte: 500, capital: 30000 },
 ];
 
-export const Controls = ({ aporte, capital, onAporteChange, onCapitalChange }: ControlsProps) => {
+export const Controls = ({
+  aporte,
+  capital,
+  years,
+  onAporteChange,
+  onCapitalChange,
+  onYearsChange,
+}: ControlsProps) => {
   const capitalUsd = (capital / FX_PEN_USD) * (1 - WISE_FEE);
+  const yearLabel = years === 1 ? '1 año' : `${years} años`;
 
   return (
     <section className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-[22px] font-medium leading-tight tracking-[-0.01em] text-[var(--text-primary)]">
-            Simulador a 10 años
+            Simulador de inversión
           </h1>
           <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
             Plan DCA con capital inicial para un inversor peruano.
           </p>
         </div>
         <span className="w-fit rounded-full bg-[var(--blue-soft)] px-2.5 py-1 text-xs font-medium text-[var(--blue-text)]">
-          Cálculo en vivo
+          Horizonte: {yearLabel}
         </span>
       </div>
 
@@ -51,7 +61,7 @@ export const Controls = ({ aporte, capital, onAporteChange, onCapitalChange }: C
       </div>
 
       <div className="rounded-lg bg-[var(--bg-subtle)] p-4">
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-3">
           <label className="block">
             <span className="flex items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
               <span>Aporte mensual</span>
@@ -93,13 +103,34 @@ export const Controls = ({ aporte, capital, onAporteChange, onCapitalChange }: C
               <span>S/30,000</span>
             </span>
           </label>
+
+          <label className="block">
+            <span className="flex items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
+              <span>Tiempo invertido</span>
+              <span className="tabular-nums text-[13px] font-medium text-[var(--text-primary)]">{yearLabel}</span>
+            </span>
+            <input
+              aria-label="Tiempo invertido"
+              className="mt-3"
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={years}
+              onChange={(event) => onYearsChange(Number(event.target.value))}
+            />
+            <span className="mt-2 flex justify-between text-[11px] text-[var(--text-tertiary)]">
+              <span>1 año</span>
+              <span>10 años</span>
+            </span>
+          </label>
         </div>
 
         <div className="mt-4 flex flex-col gap-2 border-t border-[var(--separator)] pt-3 text-xs text-[var(--text-secondary)] sm:flex-row sm:items-center sm:justify-between">
           <span>
             Capital USD neto: <span className="tabular-nums font-medium text-[var(--text-primary)]">${fmt(capitalUsd)}</span>
           </span>
-          <span>Asignación: 80% S&amp;P 500 / 20% BTC</span>
+          <span>{yearLabel} · 80% S&amp;P 500 / 20% BTC</span>
         </div>
       </div>
     </section>

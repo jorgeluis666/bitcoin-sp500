@@ -26,10 +26,14 @@ const integerPercentages = (values: number[]) => {
 };
 
 export const CompositionPanel = ({ result }: CompositionPanelProps) => {
-  const gain = Math.max(0, result.ganancia);
-  const values = [result.capitalUSD, result.aportesMensualesTotal, gain];
+  const gain = result.ganancia;
+  const positiveGain = Math.max(0, gain);
+  const loss = Math.max(0, -gain);
+  const values = gain >= 0
+    ? [result.capitalUSD, result.aportesMensualesTotal, positiveGain]
+    : [result.valorFinal, loss];
   const percentages = integerPercentages(values);
-  const segments = [
+  const positiveSegments = [
     {
       label: 'Capital inicial',
       value: result.capitalUSD,
@@ -44,19 +48,36 @@ export const CompositionPanel = ({ result }: CompositionPanelProps) => {
     },
     {
       label: 'Ganancia compuesta',
-      value: gain,
+      value: positiveGain,
       pct: percentages[2],
       color: '#1E8E3E',
     },
   ];
+  const lossSegments = [
+    {
+      label: 'Valor actual',
+      value: result.valorFinal,
+      pct: percentages[0],
+      color: '#1A73E8',
+    },
+    {
+      label: 'Pérdida temporal',
+      value: loss,
+      pct: percentages[1],
+      color: '#D93025',
+    },
+  ];
+  const segments = gain >= 0 ? positiveSegments : lossSegments;
 
   return (
     <section className="rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-[var(--bg)]">
       <div>
         <h2 className="text-sm font-medium tracking-[-0.01em] text-[var(--text-primary)]">
-          ¿De dónde viene tu cartera al año 10?
+          ¿De dónde viene tu cartera al final?
         </h2>
-        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">Composición del valor final.</p>
+        <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+          Compara tu dinero aportado con la ganancia compuesta; si el horizonte es corto puede aparecer pérdida temporal.
+        </p>
       </div>
 
       <div className="mt-5 flex h-9 overflow-hidden rounded-lg bg-[var(--bg-subtle)]">

@@ -7,27 +7,32 @@ interface AbandonmentPanelProps {
 
 export const AbandonmentPanel = ({ result }: AbandonmentPanelProps) => {
   const worstValue = result.valores[result.peorMes - 1];
-  const recoveryValue = result.valores[23];
+  const recoveryMonth = result.breakEvenMes ?? Math.min(24, result.months);
+  const recoveryValue = result.valores[recoveryMonth - 1];
+  const finalText = result.years === 1 ? 'Aguantas 1 año' : `Aguantas ${result.years} años`;
+  const futureLoss = (value: number) => Math.max(0, result.valorFinal - value);
   const cards = [
     {
       label: 'Vendes en el peor momento',
       month: `Mes ${result.peorMes}`,
       value: worstValue,
-      footer: `Te pierdes $${fmt(result.valorFinal - worstValue)} futuros`,
+      footer: `Te pierdes $${fmt(futureLoss(worstValue))} futuros`,
       className: 'bg-[var(--red-soft)] text-[var(--red-text)]',
     },
     {
-      label: 'Vendes tras la recuperación',
-      month: 'Mes 24',
+      label: result.breakEvenMes === null ? 'Vendes antes de recuperar' : 'Vendes al volver a verde',
+      month: `Mes ${recoveryMonth}`,
       value: recoveryValue,
-      footer: `Te pierdes $${fmt(result.valorFinal - recoveryValue)} futuros`,
+      footer: result.breakEvenMes === null
+        ? 'Todavía estarías bajo tus aportes'
+        : `Te pierdes $${fmt(futureLoss(recoveryValue))} futuros`,
       className: 'bg-[var(--amber-soft)] text-[var(--amber-text)]',
     },
     {
-      label: 'Aguantas los 10 años',
-      month: 'Mes 120',
+      label: finalText,
+      month: `Mes ${result.months}`,
       value: result.valorFinal,
-      footer: 'Disciplina recompensada',
+      footer: 'La disciplina captura la recuperación',
       className: 'bg-[var(--green-soft)] text-[var(--green-text)]',
     },
   ];
@@ -39,7 +44,7 @@ export const AbandonmentPanel = ({ result }: AbandonmentPanelProps) => {
           Si te asustas y vendes...
         </h2>
         <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-          El costo concreto de abandonar en cada momento.
+          Este panel traduce el miedo a dólares: cuánto cuesta salir antes de que el escenario se complete.
         </p>
       </div>
       <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
