@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FFFFFF;
+  --bg-subtle: #F8F9FA;
+  --bg-hover: #F1F3F4;
+  --border: #E8EAED;
+  --border-strong: #DADCE0;
+  --separator: #F1F3F4;
+  --text-primary: #202124;
+  --text-secondary: #5F6368;
+  --text-tertiary: #80868B;
+  --blue: #1A73E8;
+  --blue-soft: #E8F0FE;
+  --blue-text: #1967D2;
+  --green: #1E8E3E;
+  --green-soft: #E6F4EA;
+  --green-text: #137333;
+  --amber: #F9AB00;
+  --amber-soft: #FEF7E0;
+  --amber-text: #B06000;
+  --red: #D93025;
+  --red-soft: #FCE8E6;
+  --red-text: #C5221F;
+  --purple: #8430CE;
+  --purple-soft: #F3E8FD;
+  --purple-text: #6F2DA8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1F1F1F;
+    --bg-subtle: #2A2A2A;
+    --bg-hover: #333333;
+    --border: #3C3C3C;
+    --border-strong: #4A4A4A;
+    --separator: #2A2A2A;
+    --text-primary: #E8EAED;
+    --text-secondary: #9AA0A6;
+    --text-tertiary: #80868B;
+    --blue-soft: #1A2B47;
+    --blue-text: #8AB4F8;
+    --green-soft: #1E2E22;
+    --green-text: #81C995;
+    --amber-soft: #2E2613;
+    --amber-text: #FDD663;
+    --red-soft: #2E1A18;
+    --red-text: #F28B82;
+    --purple-soft: #2A1F3B;
+    --purple-text: #C58AF9;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--bg);
+  font-weight: 400;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+input[type='range'] {
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+input[type='range']::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  appearance: none;
+  border: 2px solid #FFFFFF;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
+}
+
+input[type='range']::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #FFFFFF;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
+}
+
+input[type='range']:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
