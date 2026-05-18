@@ -12,7 +12,7 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import { registerChartPlugins } from './ChartPlugins';
 import { fmt, getPhase } from '@/lib/format';
@@ -25,23 +25,9 @@ interface PortfolioChartProps {
   result: SimulationResult;
 }
 
-const usePrefersDark = () => {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setIsDark(query.matches);
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  }, []);
-
-  return isDark;
-};
-
 export const PortfolioChart = ({ result }: PortfolioChartProps) => {
   const chartRef = useRef<ChartJS<'line'> | null>(null);
-  const isDark = usePrefersDark();
+  const isDark = false;
   const labels = useMemo(() => Array.from({ length: result.months }, (_, index) => String(index + 1)), [result.months]);
 
   const data = useMemo<ChartData<'line', number[], string>>(

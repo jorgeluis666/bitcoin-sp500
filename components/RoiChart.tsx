@@ -9,7 +9,7 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import type { SimulationResult } from '@/lib/types';
 
@@ -19,23 +19,9 @@ interface RoiChartProps {
   result: SimulationResult;
 }
 
-const usePrefersDark = () => {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setIsDark(query.matches);
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  }, []);
-
-  return isDark;
-};
-
 export const RoiChart = ({ result }: RoiChartProps) => {
   const chartRef = useRef<ChartJS<'bar'> | null>(null);
-  const isDark = usePrefersDark();
+  const isDark = false;
   const labels = useMemo(() => result.yearROI.map((item) => `A${item.year}`), [result.yearROI]);
 
   const data = useMemo<ChartData<'bar', number[], string>>(
